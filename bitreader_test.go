@@ -47,7 +47,7 @@ func TestReadBits32(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		value, err := bitreader.ReadBits32(32)
+		value, err := bitreader.ReadBits(32)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -57,12 +57,12 @@ func TestReadBits32(t *testing.T) {
 	}
 }
 
-func TestReadBits32LSB(t *testing.T) {
+func TestReadBitsLE(t *testing.T) {
 	bitreader := Reader(TestArray[:], true)
 	expected := []int{1720, 1768} // 11010111000, 11011101000
 	for i := range expected {
 		bitreader.ReadBit()
-		value, err := bitreader.ReadBits32(32)
+		value, err := bitreader.ReadBits(32)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -75,7 +75,10 @@ func TestReadBits32LSB(t *testing.T) {
 func TestSkipBits(t *testing.T) {
 	bitreader := Reader(TestArray[:], false)
 	expected := []bool{true, true, false, true} //00001101
-	bitreader.SkipBits(12)
+	err := bitreader.SkipBits(12)
+	if err != nil {
+		t.Fatal(err)
+	}
 	for i := range expected {
 		value, err := bitreader.ReadBit()
 		if err != nil {
@@ -87,7 +90,7 @@ func TestSkipBits(t *testing.T) {
 	}
 }
 
-func TestSkipBitsLSB(t *testing.T) {
+func TestSkipBitsLE(t *testing.T) {
 	bitreader := Reader(TestArray[:], true)
 	expected := []bool{false, false, false, false} //10110000
 	bitreader.SkipBits(12)

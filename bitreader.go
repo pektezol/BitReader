@@ -33,6 +33,10 @@ func (reader *ReaderType) SkipBits(bits int) error {
 	if bits <= 0 {
 		return fmt.Errorf("SkipBits Error: Bits value %d lower or equals than 0.", bits)
 	}
+	err := reader.checkAvailableBits(bits)
+	if err != nil {
+		return err
+	}
 	for reader.index+bits > 7 {
 		reader.base++
 		reader.index = 0
@@ -42,12 +46,20 @@ func (reader *ReaderType) SkipBits(bits int) error {
 	return nil
 }
 
-func (reader *ReaderType) ReadBits32(bits int) (int, error) {
+func (reader *ReaderType) SkipBytes(bytes int) error {
+	err := reader.SkipBits(bytes * 8)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (reader *ReaderType) ReadBits(bits int) (int, error) {
 	if bits <= 0 {
 		return -1, fmt.Errorf("ReadBits Error: Bits value %d lower or equals than 0.", bits)
 	}
-	if bits > 32 {
-		return -1, fmt.Errorf("ReadBits Error: Bits value %d higher than 32.", bits)
+	if bits > 64 {
+		return -1, fmt.Errorf("ReadBits Error: Bits value %d higher than 64.", bits)
 	}
 	err := reader.checkAvailableBits(bits)
 	if err != nil {
@@ -79,7 +91,7 @@ func (reader *ReaderType) ReadBits32(bits int) (int, error) {
 			reader.index -= 8
 		}
 		// Conversion of string binary to int
-		value, err := strconv.ParseUint(output, 2, 32)
+		value, err := strconv.ParseUint(output, 2, 64)
 		if err != nil {
 			return -1, fmt.Errorf("%s", err)
 		}
@@ -97,7 +109,7 @@ func (reader *ReaderType) ReadBits32(bits int) (int, error) {
 			}
 		}
 		// Conversion of string binary to int
-		value, err := strconv.ParseUint(output, 2, 32)
+		value, err := strconv.ParseUint(output, 2, 64)
 		if err != nil {
 			return -1, fmt.Errorf("%s", err)
 		}
@@ -106,7 +118,7 @@ func (reader *ReaderType) ReadBits32(bits int) (int, error) {
 }
 
 func (reader *ReaderType) ReadBit() (bool, error) {
-	value, err := reader.ReadBits32(1)
+	value, err := reader.ReadBits(1)
 	if err != nil {
 		return false, fmt.Errorf("ReadBit Error: %s", err)
 	}
@@ -116,7 +128,7 @@ func (reader *ReaderType) ReadBit() (bool, error) {
 func (reader *ReaderType) checkAvailableBits(bits int) error {
 	availableBits := (len(reader.data)-reader.base)*8 - reader.index
 	if availableBits < bits {
-		return fmt.Errorf("BitReaderOutOfBounds: Wanted to read %d bit(s) but only %d bit(s) is/are available.", bits, availableBits)
+		return fmt.Errorf("BitReaderOutOfBounds: Wanted to read/skip %d bit(s) but only %d bit(s) is/are available.", bits, availableBits)
 	}
 	return nil
 }
