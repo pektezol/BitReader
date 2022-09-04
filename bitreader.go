@@ -8,31 +8,24 @@ import (
 )
 
 type ReaderType struct {
-	data  []byte
-	base  int
-	index int
-	lsb   bool
+	data  []byte // Reader data from a byte array
+	base  int    // Current reader byte location
+	index int    // Current reader index
+	le    bool   // Little endian or big endian?
 }
 
-func Reader(data []byte) *ReaderType {
-	return &ReaderType{
-		data:  data,
-		base:  0,
-		index: 0,
-		lsb:   false,
-	}
-}
-
-func ReaderLSB(data []byte) *ReaderType {
-	dataReversed := data
-	for index, byteValue := range data {
-		dataReversed[index] = bits.Reverse8(byteValue)
+func Reader(data []byte, le bool) *ReaderType {
+	dataClone := data
+	if le {
+		for index, byteValue := range data {
+			dataClone[index] = bits.Reverse8(byteValue)
+		}
 	}
 	return &ReaderType{
-		data:  dataReversed,
+		data:  dataClone,
 		base:  0,
 		index: 0,
-		lsb:   true,
+		le:    le,
 	}
 }
 
@@ -60,7 +53,7 @@ func (reader *ReaderType) ReadBits32(bits int) (int, error) {
 	if err != nil {
 		return -1, err
 	}
-	if reader.lsb {
+	if reader.le {
 		var output string
 		// Go to last bit and read backwards from there
 		reader.base += bits / 8
