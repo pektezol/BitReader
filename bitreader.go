@@ -1,48 +1,96 @@
-package bitreader
+// paksd
+package main
 
 import (
 	"fmt"
-	"math/bits"
-	"strconv"
-	"strings"
+	"io"
+	"math"
 )
 
 type ReaderType struct {
-	data  []byte // Reader data from a byte array
-	base  int    // Current reader byte location
-	index int    // Current reader index
-	le    bool   // Little endian or big endian?
+	stream  io.Reader // the underlying stream we're reading bytes from
+	index   uint8     // 0-7, the current index into the byte
+	curByte byte      // the byte we're currently reading from
+	le      bool      // whether to read in little-endian order
+	// Whenever index == 0, we need to read a new byte from stream into curByte
 }
 
-func Reader(data []byte, le bool) *ReaderType {
-	dataClone := data
-	if le {
-		for index, byteValue := range data {
-			dataClone[index] = bits.Reverse8(byteValue)
-		}
-	}
+func Reader(stream io.Reader, le bool) *ReaderType {
 	return &ReaderType{
-		data:  dataClone,
-		base:  0,
-		index: 0,
-		le:    le,
+		stream:  stream,
+		index:   0,
+		curByte: 0, // initial value doesn't matter, it'll be read as soon as we try to read any bits
+		le:      le,
 	}
+}
+
+func (reader *ReaderType) TryReadInt8() (uint8, error) {
+	value, err := reader.ReadBits(8)
+	if err != nil {
+		return 0, err
+	}
+	return uint8(value), nil
+}
+
+func (reader *ReaderType) TryReadInt16() (uint16, error) {
+	value, err := reader.ReadBits(16)
+	if err != nil {
+		return 0, err
+	}
+	return uint16(value), nil
+}
+
+func (reader *ReaderType) TryReadInt32() (uint32, error) {
+	value, err := reader.ReadBits(32)
+	if err != nil {
+		return 0, err
+	}
+	return uint32(value), nil
+}
+
+func (reader *ReaderType) TryReadInt64() (uint64, error) {
+	value, err := reader.ReadBits(64)
+	if err != nil {
+		return 0, err
+	}
+	return value, nil
+}
+
+func (reader *ReaderType) TryReadFloat32() (float32, error) {
+	value, err := reader.ReadBits(32)
+	if err != nil {
+		return 0, err
+	}
+	return math.Float32frombits(uint32(value)), nil
+}
+
+func (reader *ReaderType) TryReadFloat64() (float64, error) {
+	value, err := reader.ReadBits(64)
+	if err != nil {
+		return 0, err
+	}
+	return math.Float64frombits(value), nil
 }
 
 func (reader *ReaderType) SkipBits(bits int) error {
-	if bits <= 0 {
-		return fmt.Errorf("SkipBits Error: Bits value %d lower or equals than 0.", bits)
-	}
-	err := reader.checkAvailableBits(bits)
+	// read as many raw bytes as we can
+	bytes := bits / 8
+	buf := make([]byte, bytes)
+	_, err := reader.stream.Read(buf)
 	if err != nil {
 		return err
 	}
-	for reader.index+bits > 7 {
-		reader.base++
-		reader.index = 0
-		bits -= 8
+	// the final read byte should be the new current byte
+	if bytes > 0 {
+		reader.curByte = buf[bytes-1]
 	}
-	reader.index += bits
+	// read the extra bits
+	for i := bytes * 8; i < bits; i++ {
+		_, err := reader.readBit()
+		if err != nil {
+			return err
+		}
+	}
 	return nil
 }
 
@@ -54,81 +102,68 @@ func (reader *ReaderType) SkipBytes(bytes int) error {
 	return nil
 }
 
-func (reader *ReaderType) ReadBits(bits int) (int, error) {
-	if bits <= 0 {
-		return -1, fmt.Errorf("ReadBits Error: Bits value %d lower or equals than 0.", bits)
+// Read up to 64 bits from the stream
+func (reader *ReaderType) ReadBits(bits int) (uint64, error) {
+	if bits < 1 || bits > 64 {
+		return 0, fmt.Errorf("ReadBits(bits) ERROR: Bits number should be between 1 and 64.")
 	}
-	if bits > 64 {
-		return -1, fmt.Errorf("ReadBits Error: Bits value %d higher than 64.", bits)
+	var val uint64
+	for i := 0; i < bits; i++ {
+		bit, err := reader.readBit()
+		if err != nil {
+			return 0, err
+		}
+
+		if reader.le {
+			val |= uint64(bit) << i
+		} else {
+			val |= uint64(bit) << (bits - 1 - i)
+		}
 	}
-	err := reader.checkAvailableBits(bits)
+	return val, nil
+}
+
+func (reader *ReaderType) ReadBytes(bytes int) (uint64, error) {
+	if bytes < 1 || bytes > 8 {
+		return 0, fmt.Errorf("ReadBytes(bytes) ERROR: Bytes number should be between 1 and 8.")
+	}
+	value, err := reader.ReadBits(bytes * 8)
 	if err != nil {
-		return -1, err
+		return 0, err
 	}
+	return value, nil
+}
+
+// Read a single bool from the stream
+func (reader *ReaderType) ReadBool() (bool, error) {
+	val, err := reader.readBit()
+	if err != nil {
+		return false, err
+	}
+	return val == 1, nil
+}
+
+// Read a single bit from the stream
+func (reader *ReaderType) readBit() (uint8, error) {
+	if reader.index == 0 {
+		// read a byte from stream into curByte
+		buf := make([]byte, 1)
+		_, err := reader.stream.Read(buf)
+		if err != nil {
+			return 0, err
+		}
+		reader.curByte = buf[0]
+	}
+	var val bool
 	if reader.le {
-		var output string
-		// Go to last bit and read backwards from there
-		reader.base += bits / 8
-		reader.index += bits % 8
-		if reader.index > 7 {
-			reader.index -= 8
-			reader.base++
-		}
-		for i := 0; i < bits; i++ {
-			reader.index--
-			if reader.index < 0 {
-				reader.base--
-				reader.index = 7
-			}
-			binary := fmt.Sprintf("%08b", reader.data[reader.base])
-			binaryArr := strings.Split(binary, "")
-			output += binaryArr[reader.index]
-		}
-		// Return to last bit after reading
-		reader.base += bits / 8
-		reader.index += bits % 8
-		if reader.index > 7 {
-			reader.index -= 8
-		}
-		// Conversion of string binary to int
-		value, err := strconv.ParseUint(output, 2, 64)
-		if err != nil {
-			return -1, fmt.Errorf("%s", err)
-		}
-		return int(value), nil
+		val = (reader.curByte & (1 << reader.index)) != 0
 	} else {
-		var output string
-		for i := 0; i < bits; i++ {
-			binary := fmt.Sprintf("%08b", reader.data[reader.base])
-			binaryArr := strings.Split(binary, "")
-			output += binaryArr[reader.index]
-			reader.index++
-			if reader.index > 7 {
-				reader.base++
-				reader.index = 0
-			}
-		}
-		// Conversion of string binary to int
-		value, err := strconv.ParseUint(output, 2, 64)
-		if err != nil {
-			return -1, fmt.Errorf("%s", err)
-		}
-		return int(value), nil
+		val = (reader.curByte & (1 << (7 - reader.index))) != 0
 	}
-}
-
-func (reader *ReaderType) ReadBit() (bool, error) {
-	value, err := reader.ReadBits(1)
-	if err != nil {
-		return false, fmt.Errorf("ReadBit Error: %s", err)
+	reader.index = (reader.index + 1) % 8
+	if val {
+		return 1, nil
+	} else {
+		return 0, nil
 	}
-	return value != 0, nil
-}
-
-func (reader *ReaderType) checkAvailableBits(bits int) error {
-	availableBits := (len(reader.data)-reader.base)*8 - reader.index
-	if availableBits < bits {
-		return fmt.Errorf("BitReaderOutOfBounds: Wanted to read/skip %d bit(s) but only %d bit(s) is/are available.", bits, availableBits)
-	}
-	return nil
 }
