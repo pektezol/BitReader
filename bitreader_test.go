@@ -12,10 +12,7 @@ func TestTryReadFloat32(t *testing.T) {
 	bitreader := Reader(bytes.NewReader(TestArray[:]), false)
 	expected := []float32{6.98198182157e+29, -2.10064170919e-18}
 	for i := range expected {
-		value, err := bitreader.TryReadFloat32()
-		if err != nil {
-			t.Fatal(err)
-		}
+		value := bitreader.TryReadFloat32()
 		if value != expected[i] {
 			t.Fatalf("TryReadFloat32 FAIL for index %d: Expected %f, Got %f", i, expected[i], value)
 		}
@@ -26,10 +23,7 @@ func TestTryReadFloat64(t *testing.T) {
 	bitreader := Reader(bytes.NewReader(TestArray[:]), false)
 	expected := []float64{3.68828741038253948851462939603e+236}
 	for i := range expected {
-		value, err := bitreader.TryReadFloat64()
-		if err != nil {
-			t.Fatal(err)
-		}
+		value := bitreader.TryReadFloat64()
 		if value != expected[i] {
 			t.Fatalf("TryReadFloat64 FAIL for index %d: Expected %f, Got %f", i, expected[i], value)
 		}
@@ -40,10 +34,7 @@ func TestTryReadInt8(t *testing.T) {
 	bitreader := Reader(bytes.NewReader(TestArray[:]), false)
 	expected := []int{113, 13, 0}
 	for i := range expected {
-		value, err := bitreader.TryReadInt8()
-		if err != nil {
-			t.Fatal(err)
-		}
+		value := bitreader.TryReadInt8()
 		if int(value) != expected[i] {
 			t.Fatalf("TryReadInt8 FAIL for index %d: Expected %d, Got %d", i, expected[i], value)
 		}
@@ -54,10 +45,7 @@ func TestTryReadInt16(t *testing.T) {
 	bitreader := Reader(bytes.NewReader(TestArray[:]), false)
 	expected := []int{28941, 0, 41499, 0}
 	for i := range expected {
-		value, err := bitreader.TryReadInt16()
-		if err != nil {
-			t.Fatal(err)
-		}
+		value := bitreader.TryReadInt16()
 		if int(value) != expected[i] {
 			t.Fatalf("TryReadInt16 FAIL for index %d: Expected %d, Got %d", i, expected[i], value)
 		}
@@ -68,10 +56,7 @@ func TestTryReadInt32(t *testing.T) {
 	bitreader := Reader(bytes.NewReader(TestArray[:]), false)
 	expected := []int{1896677376, 2719678464}
 	for i := range expected {
-		value, err := bitreader.TryReadInt32()
-		if err != nil {
-			t.Fatal(err)
-		}
+		value := bitreader.TryReadInt32()
 		if int(value) != expected[i] {
 			t.Fatalf("TryReadInt32 FAIL for index %d: Expected %d, Got %d", i, expected[i], value)
 		}
@@ -82,10 +67,7 @@ func TestTryReadInt64(t *testing.T) {
 	bitreader := Reader(bytes.NewReader(TestArray[:]), false)
 	expected := []int{8146167303702773760}
 	for i := range expected {
-		value, err := bitreader.TryReadInt64()
-		if err != nil {
-			t.Fatal(err)
-		}
+		value := bitreader.TryReadInt64()
 		if int(value) != expected[i] {
 			t.Fatalf("TryReadInt64 FAIL for index %d: Expected %d, Got %d", i, expected[i], value)
 		}

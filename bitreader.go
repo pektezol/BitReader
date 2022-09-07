@@ -24,52 +24,52 @@ func Reader(stream io.Reader, le bool) *ReaderType {
 	}
 }
 
-func (reader *ReaderType) TryReadInt8() (uint8, error) {
+func (reader *ReaderType) TryReadInt8() uint8 {
 	value, err := reader.ReadBits(8)
 	if err != nil {
-		return 0, err
+		panic(err)
 	}
-	return uint8(value), nil
+	return uint8(value)
 }
 
-func (reader *ReaderType) TryReadInt16() (uint16, error) {
+func (reader *ReaderType) TryReadInt16() uint16 {
 	value, err := reader.ReadBits(16)
 	if err != nil {
-		return 0, err
+		panic(err)
 	}
-	return uint16(value), nil
+	return uint16(value)
 }
 
-func (reader *ReaderType) TryReadInt32() (uint32, error) {
+func (reader *ReaderType) TryReadInt32() uint32 {
 	value, err := reader.ReadBits(32)
 	if err != nil {
-		return 0, err
+		panic(err)
 	}
-	return uint32(value), nil
+	return uint32(value)
 }
 
-func (reader *ReaderType) TryReadInt64() (uint64, error) {
+func (reader *ReaderType) TryReadInt64() uint64 {
 	value, err := reader.ReadBits(64)
 	if err != nil {
-		return 0, err
+		panic(err)
 	}
-	return value, nil
+	return value
 }
 
-func (reader *ReaderType) TryReadFloat32() (float32, error) {
+func (reader *ReaderType) TryReadFloat32() float32 {
 	value, err := reader.ReadBits(32)
 	if err != nil {
-		return 0, err
+		panic(err)
 	}
-	return math.Float32frombits(uint32(value)), nil
+	return math.Float32frombits(uint32(value))
 }
 
-func (reader *ReaderType) TryReadFloat64() (float64, error) {
+func (reader *ReaderType) TryReadFloat64() float64 {
 	value, err := reader.ReadBits(64)
 	if err != nil {
-		return 0, err
+		panic(err)
 	}
-	return math.Float64frombits(value), nil
+	return math.Float64frombits(value)
 }
 
 func (reader *ReaderType) SkipBits(bits int) error {
