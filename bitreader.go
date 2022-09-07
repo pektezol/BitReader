@@ -1,5 +1,5 @@
 // paksd
-package main
+package bitreader
 
 import (
 	"fmt"

@@ -1,4 +1,4 @@
-package main
+package bitreader
 
 import (
 	"bytes"
@@ -9,7 +9,7 @@ import (
 var TestArray = [...]byte{113, 13, 0, 0, 162, 27, 0, 0, 204}
 
 func TestTryReadFloat32(t *testing.T) {
-	bitreader := Reader(bytes.NewBuffer(TestArray[:]), false)
+	bitreader := Reader(bytes.NewReader(TestArray[:]), false)
 	expected := []float32{6.98198182157e+29, -2.10064170919e-18}
 	for i := range expected {
 		value, err := bitreader.TryReadFloat32()
@@ -23,7 +23,7 @@ func TestTryReadFloat32(t *testing.T) {
 }
 
 func TestTryReadFloat64(t *testing.T) {
-	bitreader := Reader(bytes.NewBuffer(TestArray[:]), false)
+	bitreader := Reader(bytes.NewReader(TestArray[:]), false)
 	expected := []float64{3.68828741038253948851462939603e+236}
 	for i := range expected {
 		value, err := bitreader.TryReadFloat64()
@@ -37,7 +37,7 @@ func TestTryReadFloat64(t *testing.T) {
 }
 
 func TestTryReadInt8(t *testing.T) {
-	bitreader := Reader(bytes.NewBuffer(TestArray[:]), false)
+	bitreader := Reader(bytes.NewReader(TestArray[:]), false)
 	expected := []int{113, 13, 0}
 	for i := range expected {
 		value, err := bitreader.TryReadInt8()
@@ -51,7 +51,7 @@ func TestTryReadInt8(t *testing.T) {
 }
 
 func TestTryReadInt16(t *testing.T) {
-	bitreader := Reader(bytes.NewBuffer(TestArray[:]), false)
+	bitreader := Reader(bytes.NewReader(TestArray[:]), false)
 	expected := []int{28941, 0, 41499, 0}
 	for i := range expected {
 		value, err := bitreader.TryReadInt16()
@@ -65,7 +65,7 @@ func TestTryReadInt16(t *testing.T) {
 }
 
 func TestTryReadInt32(t *testing.T) {
-	bitreader := Reader(bytes.NewBuffer(TestArray[:]), false)
+	bitreader := Reader(bytes.NewReader(TestArray[:]), false)
 	expected := []int{1896677376, 2719678464}
 	for i := range expected {
 		value, err := bitreader.TryReadInt32()
@@ -79,7 +79,7 @@ func TestTryReadInt32(t *testing.T) {
 }
 
 func TestTryReadInt64(t *testing.T) {
-	bitreader := Reader(bytes.NewBuffer(TestArray[:]), false)
+	bitreader := Reader(bytes.NewReader(TestArray[:]), false)
 	expected := []int{8146167303702773760}
 	for i := range expected {
 		value, err := bitreader.TryReadInt64()
@@ -93,7 +93,7 @@ func TestTryReadInt64(t *testing.T) {
 }
 
 func TestReadBit(t *testing.T) {
-	bitreader := Reader(bytes.NewBuffer(TestArray[:]), false)
+	bitreader := Reader(bytes.NewReader(TestArray[:]), false)
 	expected := []bool{false, true, true, true}
 	for i := range expected {
 		value, err := bitreader.ReadBool()
@@ -107,7 +107,7 @@ func TestReadBit(t *testing.T) {
 }
 
 func TestReadBitLE(t *testing.T) {
-	bitreader := Reader(bytes.NewBuffer(TestArray[:]), true)
+	bitreader := Reader(bytes.NewReader(TestArray[:]), true)
 	expected := []bool{true, false, false, false}
 	for i := range expected {
 		value, err := bitreader.ReadBool()
@@ -121,7 +121,7 @@ func TestReadBitLE(t *testing.T) {
 }
 
 func TestReadBits(t *testing.T) {
-	bitreader := Reader(bytes.NewBuffer(TestArray[:]), false)
+	bitreader := Reader(bytes.NewReader(TestArray[:]), false)
 	expected := []int{3793354753, 2288779267} // 11100010000110100000000000000001, 10001000011011000000000000000011
 	expectedBool := []bool{false, false}
 	for i := range expected {
@@ -143,7 +143,7 @@ func TestReadBits(t *testing.T) {
 }
 
 func TestReadBitsLE(t *testing.T) {
-	bitreader := Reader(bytes.NewBuffer(TestArray[:]), true)
+	bitreader := Reader(bytes.NewReader(TestArray[:]), true)
 	expected := []int{1720, 1768} // 11010111000, 11011101000
 	for i := range expected {
 		bitreader.ReadBool()
@@ -158,7 +158,7 @@ func TestReadBitsLE(t *testing.T) {
 }
 
 func TestReadBytes(t *testing.T) {
-	bitreader := Reader(bytes.NewBuffer(TestArray[:]), false)
+	bitreader := Reader(bytes.NewReader(TestArray[:]), false)
 	expected := []int{3793354753, 2288779267} // 11100010000110100000000000000001, 10001000011011000000000000000011
 	expectedBool := []bool{false, false}
 	for i := range expected {
@@ -180,7 +180,7 @@ func TestReadBytes(t *testing.T) {
 }
 
 func TestReadBytesLE(t *testing.T) {
-	bitreader := Reader(bytes.NewBuffer(TestArray[:]), true)
+	bitreader := Reader(bytes.NewReader(TestArray[:]), true)
 	expected := []int{1720, 1768} // 11010111000, 11011101000
 	for i := range expected {
 		bitreader.ReadBool()
@@ -195,7 +195,7 @@ func TestReadBytesLE(t *testing.T) {
 }
 
 func TestSkipBits(t *testing.T) {
-	bitreader := Reader(bytes.NewBuffer(TestArray[:]), false)
+	bitreader := Reader(bytes.NewReader(TestArray[:]), false)
 	expected := []bool{true, true, false, true} //00001101
 	err := bitreader.SkipBits(12)
 	if err != nil {
@@ -213,7 +213,7 @@ func TestSkipBits(t *testing.T) {
 }
 
 func TestSkipBitsLE(t *testing.T) {
-	bitreader := Reader(bytes.NewBuffer(TestArray[:]), true)
+	bitreader := Reader(bytes.NewReader(TestArray[:]), true)
 	expected := []bool{false, false, false, false} //10110000
 	bitreader.SkipBits(12)
 	for i := range expected {
