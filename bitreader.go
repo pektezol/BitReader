@@ -24,6 +24,22 @@ func Reader(stream io.Reader, le bool) *ReaderType {
 	}
 }
 
+func (reader *ReaderType) TryReadBool() bool {
+	flag, err := reader.ReadBool()
+	if err != nil {
+		panic(err)
+	}
+	return flag
+}
+
+func (reader *ReaderType) TryReadInt1() uint8 {
+	value, err := reader.ReadBits(1)
+	if err != nil {
+		panic(err)
+	}
+	return uint8(value)
+}
+
 func (reader *ReaderType) TryReadInt8() uint8 {
 	value, err := reader.ReadBits(8)
 	if err != nil {
