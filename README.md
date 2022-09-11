@@ -1,4 +1,4 @@
-# BitReader [![Go Report Card](https://goreportcard.com/badge/github.com/bisaxa/bitreader)](https://goreportcard.com/report/github.com/bisaxa/bitreader) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/bisaxa/bitreader/blob/main/LICENSE)
+# BitReader [![Go Report Card](https://goreportcard.com/badge/github.com/bisaxa/bitreader)](https://goreportcard.com/report/github.com/bisaxa/bitreader) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/bisaxa/bitreader/blob/main/LICENSE) [![Go Reference](https://pkg.go.dev/badge/github.com/bisaxa/bitreader.svg)](https://pkg.go.dev/github.com/bisaxa/bitreader)
 A simple bit reader with big/little-endian support for golang.\
 Reads data from an existing byte array.\
 Uses string manipulation (for now).\
@@ -15,24 +15,42 @@ $ go get github.com/bisaxa/bitreader
 ```go
 import "github.com/bisaxa/bitreader"
 
-// data: []byte  Data to read from byte array
-// le:     bool  Little-endian(true) or big-endian(false) state
+// data:  io.Reader  Data to read from a io stream
+// le:    bool       Little-endian(true) or big-endian(false) state
 reader := bitreader.Reader(data, le)
 
-// read first bit
-state, err := reader.ReadBit()
+// Read First Bit
+state, err := reader.ReadBool()
 
-// skip bits/bytes
+// Skip Bits/Bytes
 err := reader.SkipBits(8)
 err := reader.SkipBytes(4)
 
-// read bits
-value, err := reader.ReadBits(11)
+// Read Bits/Bytes
+value, err := reader.ReadBytes(4)
 value, err := reader.ReadBits(64) // up to 64 bits
+
+// Wrapper functions
+state := reader.TryReadBool()       // bool
+value := reader.TryReadInt1()       // uint8
+value := reader.TryReadInt8()       // uint8
+value := reader.TryReadInt16()      // uint16
+value := reader.TryReadInt32()      // uint32
+value := reader.TryReadInt64()      // uint64
+value := reader.TryReadFloat32()    // float32
+value := reader.TryReadFloat64()    // float64
 ```
 
 ## Error Handling
-ReadBits(x), ReadBit(), SkipBits(x) and SkipBytes(x) functions returns an error message when they don't work as expected. It is advised to always handle errors.
+ReadBits(x), ReadBytes(x), ReadBool(), SkipBits(x) and SkipBytes(x) functions returns an error message when they don't work as expected. It is advised to always handle errors. \
+Wrapper functions, however, only returns the value and panics if an error is encountered.
+
+## Bug Report / Feature Request
+Using [Github Issues](https://github.com/BiSaXa/BitReader/issues/new/choose), you can report a bug that you encountered and/or request a feature that you would like to be added.
+
+## Documentation
+
+Full documentation can be found in https://pkg.go.dev/github.com/bisaxa/bitreader
 
 ## License
 This project is licensed under [MIT License](LICENSE).

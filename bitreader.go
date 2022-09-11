@@ -15,11 +15,16 @@ import (
 
 // ReaderType is the main structure of our Reader.
 // Whenever index == 0, we need to read a new byte from stream into curByte
+//
+// stream io.Reader The underlying stream we're reading bytes from
+// index uint18		The current index into the byte [0-7]
+// curByte byte		The byte we're currently reading from
+// le bool 			Whether to read in little-endian order
 type ReaderType struct {
-	stream  io.Reader // The underlying stream we're reading bytes from
-	index   uint8     // The current index into the byte [0-7]
-	curByte byte      // The byte we're currently reading from
-	le      bool      // Whether to read in little-endian order
+	stream  io.Reader
+	index   uint8
+	curByte byte
+	le      bool
 }
 
 // Reader is the main constructor that creates the ReaderType object
