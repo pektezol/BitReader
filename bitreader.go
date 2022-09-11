@@ -1,4 +1,10 @@
-// paksd
+// BitReader is a simple bit reader with big/little-endian support for golang.
+// It can read stream data from an io.Reader; can read from os.File and a byte array with bytes.NewReader(array).
+// Uses bitwise operations for v2.
+// Supports reading up to 64 bits at one time.
+// Includes wrapper functions for most used data types.
+// Error checking on all but wrapper functions.
+// Thanks to github.com/mlugg for the big help!
 package bitreader
 
 import (
@@ -7,23 +13,28 @@ import (
 	"math"
 )
 
+// ReaderType is the main structure of our Reader.
+// Whenever index == 0, we need to read a new byte from stream into curByte
 type ReaderType struct {
-	stream  io.Reader // the underlying stream we're reading bytes from
-	index   uint8     // 0-7, the current index into the byte
-	curByte byte      // the byte we're currently reading from
-	le      bool      // whether to read in little-endian order
-	// Whenever index == 0, we need to read a new byte from stream into curByte
+	stream  io.Reader // The underlying stream we're reading bytes from
+	index   uint8     // The current index into the byte [0-7]
+	curByte byte      // The byte we're currently reading from
+	le      bool      // Whether to read in little-endian order
 }
 
+// Reader is the main constructor that creates the ReaderType object
+// with stream data and little-endian state.
 func Reader(stream io.Reader, le bool) *ReaderType {
 	return &ReaderType{
 		stream:  stream,
 		index:   0,
-		curByte: 0, // initial value doesn't matter, it'll be read as soon as we try to read any bits
+		curByte: 0, // Initial value doesn't matter, it'll be read as soon as we try to read any bits
 		le:      le,
 	}
 }
 
+// TryReadBool is a wrapper function that gets the state of 1-bit,
+// returns true if 1, false if 0. Panics on error.
 func (reader *ReaderType) TryReadBool() bool {
 	flag, err := reader.ReadBool()
 	if err != nil {
@@ -32,6 +43,8 @@ func (reader *ReaderType) TryReadBool() bool {
 	return flag
 }
 
+// TryReadInt1 is a wrapper function that returns the value of 1-bit.
+// Returns type uint8. Panics on error.
 func (reader *ReaderType) TryReadInt1() uint8 {
 	value, err := reader.ReadBits(1)
 	if err != nil {
@@ -40,6 +53,8 @@ func (reader *ReaderType) TryReadInt1() uint8 {
 	return uint8(value)
 }
 
+// TryReadInt8 is a wrapper function that returns the value of 8-bits.
+// Returns uint8. Panics on error.
 func (reader *ReaderType) TryReadInt8() uint8 {
 	value, err := reader.ReadBits(8)
 	if err != nil {
@@ -48,6 +63,8 @@ func (reader *ReaderType) TryReadInt8() uint8 {
 	return uint8(value)
 }
 
+// TryReadInt16 is a wrapper function that returns the value of 16-bits.
+// Returns uint16. Panics on error.
 func (reader *ReaderType) TryReadInt16() uint16 {
 	value, err := reader.ReadBits(16)
 	if err != nil {
@@ -56,6 +73,8 @@ func (reader *ReaderType) TryReadInt16() uint16 {
 	return uint16(value)
 }
 
+// TryReadInt32 is a wrapper function that returns the value of 32-bits.
+// Returns uint32. Panics on error.
 func (reader *ReaderType) TryReadInt32() uint32 {
 	value, err := reader.ReadBits(32)
 	if err != nil {
@@ -64,6 +83,8 @@ func (reader *ReaderType) TryReadInt32() uint32 {
 	return uint32(value)
 }
 
+// TryReadInt64 is a wrapper function that returns the value of 64-bits.
+// Returns uint64. Panics on error.
 func (reader *ReaderType) TryReadInt64() uint64 {
 	value, err := reader.ReadBits(64)
 	if err != nil {
@@ -72,6 +93,8 @@ func (reader *ReaderType) TryReadInt64() uint64 {
 	return value
 }
 
+// TryReadFloat32 is a wrapper function that returns the value of 32-bits.
+// Returns float32. Panics on error.
 func (reader *ReaderType) TryReadFloat32() float32 {
 	value, err := reader.ReadBits(32)
 	if err != nil {
@@ -80,6 +103,8 @@ func (reader *ReaderType) TryReadFloat32() float32 {
 	return math.Float32frombits(uint32(value))
 }
 
+// TryReadFloat64 is a wrapper function that returns the value of 64-bits.
+// Returns float64. Panics on error.
 func (reader *ReaderType) TryReadFloat64() float64 {
 	value, err := reader.ReadBits(64)
 	if err != nil {
@@ -88,19 +113,22 @@ func (reader *ReaderType) TryReadFloat64() float64 {
 	return math.Float64frombits(value)
 }
 
+// SkipBits is a function that increases Reader index
+// based on given input bits number. Returns an error
+// if there are no remaining bits.
 func (reader *ReaderType) SkipBits(bits int) error {
-	// read as many raw bytes as we can
+	// Read as many raw bytes as we can
 	bytes := bits / 8
 	buf := make([]byte, bytes)
 	_, err := reader.stream.Read(buf)
 	if err != nil {
 		return err
 	}
-	// the final read byte should be the new current byte
+	// The final read byte should be the new current byte
 	if bytes > 0 {
 		reader.curByte = buf[bytes-1]
 	}
-	// read the extra bits
+	// Read the extra bits
 	for i := bytes * 8; i < bits; i++ {
 		_, err := reader.readBit()
 		if err != nil {
@@ -110,6 +138,9 @@ func (reader *ReaderType) SkipBits(bits int) error {
 	return nil
 }
 
+// SkipBytes is a function that increases Reader index
+// based on given input bytes number. Returns an error
+// if there are no remaining bits.
 func (reader *ReaderType) SkipBytes(bytes int) error {
 	err := reader.SkipBits(bytes * 8)
 	if err != nil {
@@ -118,7 +149,12 @@ func (reader *ReaderType) SkipBytes(bytes int) error {
 	return nil
 }
 
-// Read up to 64 bits from the stream
+// ReadBits is a function that reads the specified amount of bits
+// specified in the parameter and returns the value, error
+// based on the output. It can read up to 64 bits. Returns the read
+// value in type uint64.
+//
+// Returns an error if there are no remaining bits.
 func (reader *ReaderType) ReadBits(bits int) (uint64, error) {
 	if bits < 1 || bits > 64 {
 		return 0, fmt.Errorf("ReadBits(bits) ERROR: Bits number should be between 1 and 64.")
@@ -139,6 +175,12 @@ func (reader *ReaderType) ReadBits(bits int) (uint64, error) {
 	return val, nil
 }
 
+// ReadBytes is a function that reads the specified amount of bytes
+// specified in the parameter and returns the value, error
+// based on the output. It can read up to 8 bytes. Returns the read
+// value in type uint64.
+//
+// Returns an error if there are no remaining bits.
 func (reader *ReaderType) ReadBytes(bytes int) (uint64, error) {
 	if bytes < 1 || bytes > 8 {
 		return 0, fmt.Errorf("ReadBytes(bytes) ERROR: Bytes number should be between 1 and 8.")
@@ -150,7 +192,10 @@ func (reader *ReaderType) ReadBytes(bytes int) (uint64, error) {
 	return value, nil
 }
 
-// Read a single bool from the stream
+// ReadBool is a function that reads one bit and returns the state, error
+// based on the output. Returns the read value in a bool format.
+//
+// Returns an error if there are no remaining bits.
 func (reader *ReaderType) ReadBool() (bool, error) {
 	val, err := reader.readBit()
 	if err != nil {
@@ -159,10 +204,11 @@ func (reader *ReaderType) ReadBool() (bool, error) {
 	return val == 1, nil
 }
 
-// Read a single bit from the stream
+// readBit is a private function that reads a single bit from the stream.
+// This is the main function that makes us read stream data.
 func (reader *ReaderType) readBit() (uint8, error) {
 	if reader.index == 0 {
-		// read a byte from stream into curByte
+		// Read a byte from stream into curByte
 		buf := make([]byte, 1)
 		_, err := reader.stream.Read(buf)
 		if err != nil {
