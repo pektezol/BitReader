@@ -1,4 +1,4 @@
-# BitReader [![Go Report Card](https://goreportcard.com/badge/github.com/pektezol/bitreader)](https://goreportcard.com/report/github.com/pektezol/bitreader) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/pektezol/bitreader/blob/main/LICENSE)
+# BitReader [![Go Report Card](https://goreportcard.com/badge/github.com/pektezol/bitreader)](https://goreportcard.com/report/github.com/pektezol/bitreader) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/pektezol/bitreader/blob/main/LICENSE) [![Go Reference](https://pkg.go.dev/badge/github.com/bisaxa/bitreader.svg)](https://pkg.go.dev/github.com/pektezol/bitreader)
 A simple bit reader with big/little-endian support for golang.\
 Reads data from an existing byte array.\
 Uses string manipulation (for now).\
