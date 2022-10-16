@@ -1,4 +1,4 @@
-# BitReader [![Go Report Card](https://goreportcard.com/badge/github.com/bisaxa/bitreader)](https://goreportcard.com/report/github.com/bisaxa/bitreader) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/bisaxa/bitreader/blob/main/LICENSE)
+# BitReader [![Go Report Card](https://goreportcard.com/badge/github.com/pektezol/bitreader)](https://goreportcard.com/report/github.com/pektezol/bitreader) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/pektezol/bitreader/blob/main/LICENSE)
 A simple bit reader with big/little-endian support for golang.\
 Reads data from an existing byte array.\
 Uses string manipulation (for now).\
@@ -7,13 +7,13 @@ Checking for overflowing the data.
 
 ## Installation
 ```bash
-$ go get github.com/bisaxa/bitreader
+$ go get github.com/pektezol/bitreader
 ```
 
 ## Usage
 
 ```go
-import "github.com/bisaxa/bitreader"
+import "github.com/pektezol/bitreader"
 
 // data: []byte  Data to read from byte array
 // le:     bool  Little-endian(true) or big-endian(false) state
