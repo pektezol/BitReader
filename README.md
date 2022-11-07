@@ -1,9 +1,10 @@
 # BitReader [![Go Report Card](https://goreportcard.com/badge/github.com/pektezol/bitreader)](https://goreportcard.com/report/github.com/pektezol/bitreader) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/pektezol/bitreader/blob/main/LICENSE) [![Go Reference](https://pkg.go.dev/badge/github.com/pektezol/bitreader.svg)](https://pkg.go.dev/github.com/pektezol/bitreader)
 A simple bit reader with big/little-endian support for golang.\
-Reads data from an existing byte array.\
-Uses string manipulation (for now).\
+Reads stream data from an io.Reader; can read from os.File and a byte array with bytes.NewReader(array).\
+Uses bitwise operations.\
 Support reading up to 64 bits at one time.\
-Checking for overflowing the data.
+Includes wrapper functions for most used data types.\
+Error checking on all but wrapper functions.\
 
 ## Installation
 ```bash
@@ -30,7 +31,11 @@ err := reader.SkipBytes(4)
 value, err := reader.ReadBytes(4)
 value, err := reader.ReadBits(64) // up to 64 bits
 
+// Read String
+value, err := reader.ReadString() // null-terminated
+
 // Wrapper functions
+text := reader.ReadString()         // string
 state := reader.TryReadBool()       // bool
 value := reader.TryReadInt1()       // uint8
 value := reader.TryReadInt8()       // uint8
@@ -42,7 +47,7 @@ value := reader.TryReadFloat64()    // float64
 ```
 
 ## Error Handling
-ReadBits(x), ReadBytes(x), ReadBool(), SkipBits(x) and SkipBytes(x) functions returns an error message when they don't work as expected. It is advised to always handle errors. \
+ReadBits(x), ReadBytes(x), ReadBool(), ReadString(), SkipBits(x) and SkipBytes(x) functions returns an error message when they don't work as expected. It is advised to always handle errors. \
 Wrapper functions, however, only returns the value and panics if an error is encountered.
 
 ## Bug Report / Feature Request

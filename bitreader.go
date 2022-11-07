@@ -118,9 +118,17 @@ func (reader *ReaderType) TryReadFloat64() float64 {
 	return math.Float64frombits(value)
 }
 
+// TryReadString is a wrapper function that returns the string
+// that is read until it is null-terminated.
+func (reader *ReaderType) TryReadString() string {
+	text, _ := reader.ReadString()
+	return text
+}
+
 // SkipBits is a function that increases Reader index
-// based on given input bits number. Returns an error
-// if there are no remaining bits.
+// based on given input bits number.
+//
+// Returns an error if there are no remaining bits.
 func (reader *ReaderType) SkipBits(bits int) error {
 	// Read as many raw bytes as we can
 	bytes := bits / 8
@@ -144,14 +152,35 @@ func (reader *ReaderType) SkipBits(bits int) error {
 }
 
 // SkipBytes is a function that increases Reader index
-// based on given input bytes number. Returns an error
-// if there are no remaining bits.
+// based on given input bytes number.
+//
+// Returns an error if there are no remaining bits.
 func (reader *ReaderType) SkipBytes(bytes int) error {
 	err := reader.SkipBits(bytes * 8)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+// ReadString is a function that reads every byte
+// until it is null-terminated (the byte is 0). Returns the
+// string that is read until the null-termination.
+//
+// Returns an error if there are no remaining bits.
+func (reader *ReaderType) ReadString() (string, error) {
+	var out string
+	for {
+		value, err := reader.ReadBytes(1)
+		if err != nil {
+			return out, err
+		}
+		if value == 0 {
+			break
+		}
+		out += string(rune(value))
+	}
+	return out, nil
 }
 
 // ReadBits is a function that reads the specified amount of bits
