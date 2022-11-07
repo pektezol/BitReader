@@ -125,6 +125,13 @@ func (reader *ReaderType) TryReadString() string {
 	return text
 }
 
+// TryReadStringLen is a wrapper function that returns the string
+// that is read until the given length is reached or it is null-terminated.
+func (reader *ReaderType) TryReadStringLen(length int) string {
+	text, _ := reader.ReadStringLen(length)
+	return text
+}
+
 // SkipBits is a function that increases Reader index
 // based on given input bits number.
 //
@@ -176,6 +183,28 @@ func (reader *ReaderType) ReadString() (string, error) {
 			return out, err
 		}
 		if value == 0 {
+			break
+		}
+		out += string(rune(value))
+	}
+	return out, nil
+}
+
+// ReadStringLen is a function that reads every byte
+// until the given length, or it is null-terminated (the byte is 0).
+// Returns the string that is read until the lenth or null-termination.
+// It will skip the remaining bytes if it is null-terminated.
+//
+// Returns an error if there are no remaining bits.
+func (reader *ReaderType) ReadStringLen(length int) (string, error) {
+	var out string
+	for i := 0; i < length; i++ {
+		value, err := reader.ReadBytes(1)
+		if err != nil {
+			return out, err
+		}
+		if value == 0 {
+			reader.SkipBytes(length - 1 - i)
 			break
 		}
 		out += string(rune(value))
