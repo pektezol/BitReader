@@ -132,6 +132,20 @@ func (reader *ReaderType) TryReadStringLen(length int) string {
 	return text
 }
 
+// TryReadBytesToSlice is a wrapper function that reads the specified amount of bytes
+// from the parameter and puts each byte into a slice and returns this slice.
+func (reader *ReaderType) TryReadBytesToSlice(bytes int) []byte {
+	var out []byte
+	for i := 0; i < bytes; i++ {
+		val, err := reader.ReadBytes(1)
+		if err != nil {
+			panic(err)
+		}
+		out = append(out, byte(val))
+	}
+	return out
+}
+
 // SkipBits is a function that increases Reader index
 // based on given input bits number.
 //
@@ -213,7 +227,7 @@ func (reader *ReaderType) ReadStringLen(length int) (string, error) {
 }
 
 // ReadBits is a function that reads the specified amount of bits
-// specified in the parameter and returns the value, error
+// from the parameter and returns the value, error
 // based on the output. It can read up to 64 bits. Returns the read
 // value in type uint64.
 //
@@ -239,7 +253,7 @@ func (reader *ReaderType) ReadBits(bits int) (uint64, error) {
 }
 
 // ReadBytes is a function that reads the specified amount of bytes
-// specified in the parameter and returns the value, error
+// from the parameter and returns the value, error
 // based on the output. It can read up to 8 bytes. Returns the read
 // value in type uint64.
 //
@@ -253,6 +267,22 @@ func (reader *ReaderType) ReadBytes(bytes int) (uint64, error) {
 		return 0, err
 	}
 	return value, nil
+}
+
+// ReadBytesToSlice is a function that reads the specified amount of bytes
+// from the parameter and puts each byte into a slice and returns this slice.
+//
+// Returns an error if there are no remaining bytes.
+func (reader *ReaderType) ReadBytesToSlice(bytes int) ([]byte, error) {
+	var out []byte
+	for i := 0; i < bytes; i++ {
+		val, err := reader.ReadBytes(1)
+		if err != nil {
+			return out, err
+		}
+		out = append(out, byte(val))
+	}
+	return out, nil
 }
 
 // ReadBool is a function that reads one bit and returns the state, error
