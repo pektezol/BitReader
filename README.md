@@ -4,7 +4,7 @@ Reads stream data from an io.Reader; can read from os.File and a byte array with
 Uses bitwise operations.\
 Support reading up to 64 bits at one time.\
 Includes wrapper functions for most used data types.\
-Error checking on all but wrapper functions.\
+Error checking on all but wrapper functions.
 
 ## Installation
 ```bash
