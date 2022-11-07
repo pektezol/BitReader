@@ -16,7 +16,7 @@ $ go get github.com/pektezol/bitreader
 ```go
 import "github.com/pektezol/bitreader"
 
-// data:  io.Reader  Data to read from a io stream
+// data:  io.Reader  Data to read from an io stream
 // le:    bool       Little-endian(true) or big-endian(false) state
 reader := bitreader.Reader(data, le)
 
@@ -32,10 +32,12 @@ value, err := reader.ReadBytes(4)
 value, err := reader.ReadBits(64) // up to 64 bits
 
 // Read String
-value, err := reader.ReadString() // null-terminated
+text, err := reader.ReadString() // null-terminated
+text, err := reader.ReadStringLen(256) // length-specified
 
 // Wrapper functions
-text := reader.ReadString()         // string
+text := reader.TryReadString()      // string
+text := reader.TryReadStringLen(64) // string
 state := reader.TryReadBool()       // bool
 value := reader.TryReadInt1()       // uint8
 value := reader.TryReadInt8()       // uint8
@@ -47,7 +49,7 @@ value := reader.TryReadFloat64()    // float64
 ```
 
 ## Error Handling
-ReadBits(x), ReadBytes(x), ReadBool(), ReadString(), SkipBits(x) and SkipBytes(x) functions returns an error message when they don't work as expected. It is advised to always handle errors. \
+ReadBits(x), ReadBytes(x), ReadBool(), ReadString(), ReadStringLen(x) SkipBits(x) and SkipBytes(x) functions returns an error message when they don't work as expected. It is advised to always handle errors. \
 Wrapper functions, however, only returns the value and panics if an error is encountered.
 
 ## Bug Report / Feature Request
