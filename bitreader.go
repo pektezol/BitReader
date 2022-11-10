@@ -118,6 +118,26 @@ func (reader *ReaderType) TryReadFloat64() float64 {
 	return math.Float64frombits(value)
 }
 
+// TryReadBits is a wrapper function that returns the value of bits specified in the parameter.
+// Returns uint64. Panics on error.
+func (reader *ReaderType) TryReadBits(bits int) uint64 {
+	value, err := reader.ReadBits(bits)
+	if err != nil {
+		panic(err)
+	}
+	return value
+}
+
+// TryReadBytes is a wrapper function that returns the value of bits specified in the parameter.
+// Returns uint64. Panics on error.
+func (reader *ReaderType) TryReadBytes(bytes int) uint64 {
+	value, err := reader.ReadBytes(bytes)
+	if err != nil {
+		panic(err)
+	}
+	return value
+}
+
 // TryReadString is a wrapper function that returns the string
 // that is read until it is null-terminated.
 func (reader *ReaderType) TryReadString() string {

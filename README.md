@@ -46,6 +46,8 @@ value := reader.TryReadInt32()      // uint32
 value := reader.TryReadInt64()      // uint64
 value := reader.TryReadFloat32()    // float32
 value := reader.TryReadFloat64()    // float64
+value := reader.TryReadBits(64)     // uint64
+value := reader.TryReadBytes(8)     // uint64
 ```
 
 ## Error Handling
