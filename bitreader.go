@@ -168,6 +168,12 @@ func (reader *ReaderType) TryReadBitsToSlice(bits int) []byte {
 					panic(err)
 				}
 				out[i] = byte(val)
+			} else {
+				val, err := reader.ReadBytes(1)
+				if err != nil {
+					panic(err)
+				}
+				out[i] = byte(val)
 			}
 			break
 		} else {
@@ -332,6 +338,12 @@ func (reader *ReaderType) ReadBitsToSlice(bits int) ([]byte, error) {
 		if i == bytes-1 { // Not enough to fill a whole byte
 			if bits%8 != 0 {
 				val, err := reader.ReadBits(bits % 8)
+				if err != nil {
+					return out, err
+				}
+				out[i] = byte(val)
+			} else {
+				val, err := reader.ReadBytes(1)
 				if err != nil {
 					return out, err
 				}
