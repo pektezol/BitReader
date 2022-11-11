@@ -28,16 +28,22 @@ err := reader.SkipBits(8)
 err := reader.SkipBytes(4)
 
 // Read Bits/Bytes
-value, err := reader.ReadBytes(4)
-value, err := reader.ReadBits(64) // up to 64 bits
+value, err := reader.ReadBytes(4)       // up to 8 bytes
+value, err := reader.ReadBits(64)       // up to 64 bits
 
 // Read String
-text, err := reader.ReadString() // null-terminated
-text, err := reader.ReadStringLen(256) // length-specified
+text, err := reader.ReadString()        // null-terminated
+text, err := reader.ReadStringLen(256)  // length-specified
+
+// Read Bits/Bytes into Slice
+arr, err := reader.ReadBitsToSlice(128)
+arr, err := reader.ReadBytesToSlice(64)
 
 // Wrapper functions
 text := reader.TryReadString()      // string
 text := reader.TryReadStringLen(64) // string
+arr := reader.ReadBitsToSlice(128)  // []byte
+arr := reader.ReadBytesToSlice(64)  // []byte
 state := reader.TryReadBool()       // bool
 value := reader.TryReadInt1()       // uint8
 value := reader.TryReadInt8()       // uint8
@@ -51,7 +57,7 @@ value := reader.TryReadBytes(8)     // uint64
 ```
 
 ## Error Handling
-ReadBits(x), ReadBytes(x), ReadBool(), ReadString(), ReadStringLen(x) SkipBits(x) and SkipBytes(x) functions returns an error message when they don't work as expected. It is advised to always handle errors. \
+ReadBits(x), ReadBytes(x), ReadBool(), ReadString(), ReadStringLen(x), ReadBitsToSlice(x), ReadBytesToSlice(x), SkipBits(x) and SkipBytes(x) functions returns an error message when they don't work as expected. It is advised to always handle errors. \
 Wrapper functions, however, only returns the value and panics if an error is encountered.
 
 ## Bug Report / Feature Request
