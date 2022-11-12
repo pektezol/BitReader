@@ -1,4 +1,4 @@
-# BitReader [![Go Report Card](https://goreportcard.com/badge/github.com/pektezol/bitreader)](https://goreportcard.com/report/github.com/pektezol/bitreader) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/pektezol/bitreader/blob/main/LICENSE) [![Go Reference](https://pkg.go.dev/badge/github.com/pektezol/bitreader.svg)](https://pkg.go.dev/github.com/pektezol/bitreader)
+# BitReader [![Go Report Card](https://goreportcard.com/badge/github.com/pektezol/bitreader)](https://goreportcard.com/report/github.com/pektezol/bitreader) [![License: LGPL 2.1](https://img.shields.io/badge/License-LGPL_v2.1-blue.svg)](https://github.com/pektezol/bitreader/blob/main/LICENSE) [![Go Reference](https://pkg.go.dev/badge/github.com/pektezol/bitreader.svg)](https://pkg.go.dev/github.com/pektezol/bitreader)
 A simple bit reader with big/little-endian support for golang.\
 Reads stream data from an io.Reader; can read from os.File and a byte array with bytes.NewReader(array).\
 Uses bitwise operations.\
@@ -68,4 +68,4 @@ Using [Github Issues](https://github.com/pektezol/BitReader/issues/new/choose), 
 Full documentation can be found in https://pkg.go.dev/github.com/pektezol/bitreader
 
 ## License
-This project is licensed under [MIT License](LICENSE).
+This project is licensed under [GNU Lesser General Public License version 2.1](https://www.gnu.org/licenses/old-licenses/lgpl-2.1).
