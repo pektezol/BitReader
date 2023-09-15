@@ -4,7 +4,6 @@ package bitreader
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"io"
 	"math"
 )
@@ -508,7 +507,6 @@ func (reader *Reader) ReadRemainingBits() (uint64, error) {
 		if err != nil {
 			break // EOF
 		}
-		fmt.Printf("%+v\n", newReader)
 		bits++
 	}
 	return bits, nil
