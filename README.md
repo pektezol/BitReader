@@ -1,5 +1,5 @@
 # BitReader [![Go Reference](https://pkg.go.dev/badge/github.com/pektezol/bitreader.svg)](https://pkg.go.dev/github.com/pektezol/bitreader) [![Go Report Card](https://goreportcard.com/badge/github.com/pektezol/bitreader)](https://goreportcard.com/report/github.com/pektezol/bitreader) [![License: LGPL 2.1](https://img.shields.io/badge/License-LGPL_v2.1-blue.svg)](https://github.com/pektezol/bitreader/blob/main/LICENSE) 
-A simple bit reader with big/little-endian support for golang.
+The simplest bit reader with big/little-endian support for Golang.
 
 ## Installation
 ```bash
