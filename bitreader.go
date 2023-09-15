@@ -197,7 +197,7 @@ func (reader *Reader) TryReadFloat64() float64 {
 // TryReadBits is a wrapper function that returns the value of bits specified in the parameter.
 //
 // Returns uint64. Panics on overflow.
-func (reader *Reader) TryReadBits(bits int) uint64 {
+func (reader *Reader) TryReadBits(bits uint64) uint64 {
 	value, err := reader.ReadBits(bits)
 	if err != nil {
 		panic(err)
@@ -208,7 +208,7 @@ func (reader *Reader) TryReadBits(bits int) uint64 {
 // TryReadBytes is a wrapper function that returns the value of bits specified in the parameter.
 //
 // Returns uint64. Panics on overflow.
-func (reader *Reader) TryReadBytes(bytes int) uint64 {
+func (reader *Reader) TryReadBytes(bytes uint64) uint64 {
 	value, err := reader.ReadBytes(bytes)
 	if err != nil {
 		panic(err)
@@ -232,7 +232,7 @@ func (reader *Reader) TryReadString() string {
 // that is read until the given length is reached or it is null-terminated.
 //
 // Returns string. Panics on overflow.
-func (reader *Reader) TryReadStringLength(length int) string {
+func (reader *Reader) TryReadStringLength(length uint64) string {
 	text, err := reader.ReadStringLength(length)
 	if err != nil {
 		panic(err)
@@ -244,13 +244,14 @@ func (reader *Reader) TryReadStringLength(length int) string {
 // from the parameter and puts each bit into a slice and returns this slice.
 //
 // Returns []byte. Panics on overflow.
-func (reader *Reader) TryReadBitsToSlice(bits int) []byte {
+func (reader *Reader) TryReadBitsToSlice(bits uint64) []byte {
 	bytes := (bits / 8)
 	if bits%8 != 0 {
 		bytes++
 	}
 	out := make([]byte, bytes)
-	for i := 0; i < bytes; i++ {
+	var i uint64
+	for i = 0; i < bytes; i++ {
 		if i == bytes-1 { // Not enough to fill a whole byte
 			if bits%8 != 0 {
 				val, err := reader.ReadBits(bits % 8)
@@ -281,9 +282,10 @@ func (reader *Reader) TryReadBitsToSlice(bits int) []byte {
 // from the parameter and puts each byte into a slice and returns this slice.
 //
 // Returns []byte. Panics on overflow.
-func (reader *Reader) TryReadBytesToSlice(bytes int) []byte {
+func (reader *Reader) TryReadBytesToSlice(bytes uint64) []byte {
 	var out []byte
-	for i := 0; i < bytes; i++ {
+	var i uint64
+	for i = 0; i < bytes; i++ {
 		val, err := reader.ReadBytes(1)
 		if err != nil {
 			panic(err)
@@ -323,12 +325,13 @@ func (reader *Reader) ReadBool() (bool, error) {
 // value in type uint64.
 //
 // Returns an error if there are no remaining bits.
-func (reader *Reader) ReadBits(bits int) (uint64, error) {
+func (reader *Reader) ReadBits(bits uint64) (uint64, error) {
 	if bits < 1 || bits > 64 {
 		return 0, errors.New("ReadBits(bits) ERROR: Bits number should be between 1 and 64")
 	}
 	var val uint64
-	for i := 0; i < bits; i++ {
+	var i uint64
+	for i = 0; i < bits; i++ {
 		bit, err := reader.readBit()
 		if err != nil {
 			return 0, err
@@ -348,7 +351,7 @@ func (reader *Reader) ReadBits(bits int) (uint64, error) {
 // value in type uint64.
 //
 // Returns an error if there are no remaining bits.
-func (reader *Reader) ReadBytes(bytes int) (uint64, error) {
+func (reader *Reader) ReadBytes(bytes uint64) (uint64, error) {
 	if bytes < 1 || bytes > 8 {
 		return 0, errors.New("ReadBytes(bytes) ERROR: Bytes number should be between 1 and 8")
 	}
@@ -385,9 +388,10 @@ func (reader *Reader) ReadString() (string, error) {
 // It will skip the remaining bytes if it is null-terminated.
 //
 // Returns an error if there are no remaining bits.
-func (reader *Reader) ReadStringLength(length int) (string, error) {
+func (reader *Reader) ReadStringLength(length uint64) (string, error) {
 	var out string
-	for i := 0; i < length; i++ {
+	var i uint64
+	for i = 0; i < length; i++ {
 		value, err := reader.ReadBytes(1)
 		if err != nil {
 			return out, err
@@ -405,13 +409,14 @@ func (reader *Reader) ReadStringLength(length int) (string, error) {
 // from the parameter and puts each bit into a slice and returns this slice.
 //
 // Returns an error if there are no remaining bits.
-func (reader *Reader) ReadBitsToSlice(bits int) ([]byte, error) {
+func (reader *Reader) ReadBitsToSlice(bits uint64) ([]byte, error) {
 	bytes := (bits / 8)
 	if bits%8 != 0 {
 		bytes++
 	}
 	out := make([]byte, bytes)
-	for i := 0; i < bytes; i++ {
+	var i uint64
+	for i = 0; i < bytes; i++ {
 		if i == bytes-1 { // Not enough to fill a whole byte
 			if bits%8 != 0 {
 				val, err := reader.ReadBits(bits % 8)
@@ -442,9 +447,10 @@ func (reader *Reader) ReadBitsToSlice(bits int) ([]byte, error) {
 // from the parameter and puts each byte into a slice and returns this slice.
 //
 // Returns an error if there are no remaining bytes.
-func (reader *Reader) ReadBytesToSlice(bytes int) ([]byte, error) {
+func (reader *Reader) ReadBytesToSlice(bytes uint64) ([]byte, error) {
 	var out []byte
-	for i := 0; i < bytes; i++ {
+	var i uint64
+	for i = 0; i < bytes; i++ {
 		val, err := reader.ReadBytes(1)
 		if err != nil {
 			return out, err
@@ -458,7 +464,7 @@ func (reader *Reader) ReadBytesToSlice(bytes int) ([]byte, error) {
 // based on given input bits number.
 //
 // Returns an error if there are no remaining bits.
-func (reader *Reader) SkipBits(bits int) error {
+func (reader *Reader) SkipBits(bits uint64) error {
 	// Read as many raw bytes as we can
 	bytes := bits / 8
 	if bytes > 0 {
@@ -484,7 +490,7 @@ func (reader *Reader) SkipBits(bits int) error {
 // based on given input bytes number.
 //
 // Returns an error if there are no remaining bits.
-func (reader *Reader) SkipBytes(bytes int) error {
+func (reader *Reader) SkipBytes(bytes uint64) error {
 	err := reader.SkipBits(bytes * 8)
 	if err != nil {
 		return err
