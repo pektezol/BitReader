@@ -1,5 +1,5 @@
 // BitReader is a simple bit reader with big/little-endian support for golang.
-// %83.2 coerage
+// %83.6 coerage
 package bitreader
 
 import (
@@ -616,7 +616,7 @@ func TestReader_TryReadFloat64(t *testing.T) {
 
 func TestReader_TryReadBits(t *testing.T) {
 	type args struct {
-		bits int
+		bits uint64
 	}
 	tests := []struct {
 		name   string
@@ -662,7 +662,7 @@ func TestReader_TryReadBits(t *testing.T) {
 
 func TestReader_TryReadBytes(t *testing.T) {
 	type args struct {
-		bytes int
+		bytes uint64
 	}
 	tests := []struct {
 		name   string
@@ -744,7 +744,7 @@ func TestReader_TryReadString(t *testing.T) {
 
 func TestReader_TryReadStringLength(t *testing.T) {
 	type args struct {
-		length int
+		length uint64
 	}
 	tests := []struct {
 		name   string
@@ -803,7 +803,7 @@ func TestReader_TryReadStringLength(t *testing.T) {
 
 func TestReader_TryReadBitsToSlice(t *testing.T) {
 	type args struct {
-		bits int
+		bits uint64
 	}
 	tests := []struct {
 		name   string
@@ -875,7 +875,7 @@ func TestReader_TryReadBitsToSlice(t *testing.T) {
 
 func TestReader_TryReadBytesToSlice(t *testing.T) {
 	type args struct {
-		bytes int
+		bytes uint64
 	}
 	tests := []struct {
 		name   string
@@ -1012,7 +1012,7 @@ func TestReader_ReadBool(t *testing.T) {
 
 func TestReader_ReadBits(t *testing.T) {
 	type args struct {
-		bits int
+		bits uint64
 	}
 	tests := []struct {
 		name    string
@@ -1064,7 +1064,7 @@ func TestReader_ReadBits(t *testing.T) {
 
 func TestReader_ReadBytes(t *testing.T) {
 	type args struct {
-		bytes int
+		bytes uint64
 	}
 	tests := []struct {
 		name    string
@@ -1158,7 +1158,7 @@ func TestReader_ReadString(t *testing.T) {
 
 func TestReader_ReadStringLength(t *testing.T) {
 	type args struct {
-		length int
+		length uint64
 	}
 	tests := []struct {
 		name    string
@@ -1223,7 +1223,7 @@ func TestReader_ReadStringLength(t *testing.T) {
 
 func TestReader_ReadBitsToSlice(t *testing.T) {
 	type args struct {
-		bits int
+		bits uint64
 	}
 	tests := []struct {
 		name    string
@@ -1301,7 +1301,7 @@ func TestReader_ReadBitsToSlice(t *testing.T) {
 
 func TestReader_ReadBytesToSlice(t *testing.T) {
 	type args struct {
-		bytes int
+		bytes uint64
 	}
 	tests := []struct {
 		name    string

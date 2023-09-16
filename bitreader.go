@@ -368,18 +368,18 @@ func (reader *Reader) ReadBytes(bytes uint64) (uint64, error) {
 //
 // Returns an error if there are no remaining bits.
 func (reader *Reader) ReadString() (string, error) {
-	var out string
+	var out []byte
 	for {
 		value, err := reader.ReadBytes(1)
 		if err != nil {
-			return out, err
+			return string(out), err
 		}
 		if value == 0 {
 			break
 		}
-		out += string(rune(value))
+		out = append(out, byte(value))
 	}
-	return out, nil
+	return string(out), nil
 }
 
 // ReadStringLength is a function that reads every byte
@@ -389,20 +389,20 @@ func (reader *Reader) ReadString() (string, error) {
 //
 // Returns an error if there are no remaining bits.
 func (reader *Reader) ReadStringLength(length uint64) (string, error) {
-	var out string
+	var out []byte
 	var i uint64
 	for i = 0; i < length; i++ {
 		value, err := reader.ReadBytes(1)
 		if err != nil {
-			return out, err
+			return string(out), err
 		}
 		if value == 0 {
 			reader.SkipBytes(length - 1 - i)
 			break
 		}
-		out += string(rune(value))
+		out = append(out, byte(value))
 	}
-	return out, nil
+	return string(out), nil
 }
 
 // ReadBitsToSlice is a function that reads the specified amount of bits
